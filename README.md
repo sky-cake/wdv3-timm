@@ -1,14 +1,17 @@
 # wdv3-timm
 
 ```bash
-# input
+# set up
 git clone https://github.com/neggles/wdv3-timm.git
 cd wd3-timm
 python3.12 -m venv venv
 source venv/bin/activate
 python -m pip install -r requirements.txt
+```
 
-python3.12 wdv3_timm.py /path/to/image/or/image/dir
+```bash
+# run
+python3.12 wdv3_timm.py --model <vit|swinv2|convnext> --char-threshold 0.2 --gen-threshold 0.2 /path/to/image/or/image/dir
 ```
 
 ```bash
