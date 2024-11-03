@@ -8,7 +8,7 @@ python3.12 -m venv venv
 source venv/bin/activate
 python -m pip install -r requirements.txt
 
-python3.12 wdv3_timm.py --model <vit|swinv2|convnext> /path/to/image/or/image/dir
+python3.12 wdv3_timm.py /path/to/image/or/image/dir
 ```
 
 ```bash
