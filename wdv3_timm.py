@@ -1,18 +1,16 @@
 import argparse
+import csv
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-import numpy as np
-import pandas as pd
 import timm
 import torch
 from PIL import Image
 from timm.data import create_transform, resolve_data_config
 from torch import Tensor, nn
 from torch.nn import functional as F
-import os
-
 
 torch_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -50,17 +48,24 @@ def pil_pad_square(image: Image.Image) -> Image.Image:
 
 def load_labels_hf() -> LabelData:
     csv_path = os.path.join(os.path.dirname(__file__), 'labels.csv')
-    df = pd.read_csv(csv_path, usecols=["name", "category"])
-    return LabelData(
-        names=df["name"].tolist(),
-        rating=list(np.where(df["category"] == 9)[0]),
-        general=list(np.where(df["category"] == 0)[0]),
-        character=list(np.where(df["category"] == 4)[0]),
-    )
+    names = []
+    rating, general, character = [], [], []
+    with open(csv_path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for idx, row in enumerate(reader):
+            names.append(row["name"])
+            category = int(row["category"])
+            if category == 9:
+                rating.append(idx)
+            elif category == 0:
+                general.append(idx)
+            elif category == 4:
+                character.append(idx)
+    return LabelData(names=names, rating=rating, general=general, character=character)
 
 
 def get_tags(probs: Tensor, labels: LabelData, gen_threshold: float, char_threshold: float) -> Tuple[str, Dict[str, float], Dict[str, float], Dict[str, float]]:
-    probs = list(zip(labels.names, probs.cpu().numpy()))
+    probs = list(zip(labels.names, map(float, probs.cpu().numpy())))
     rating_labels = {labels.names[i]: probs[i][1] for i in labels.rating}
     gen_labels = {label: score for label, score in (probs[i] for i in labels.general) if score > gen_threshold}
     char_labels = {label: score for label, score in (probs[i] for i in labels.character) if score > char_threshold}
