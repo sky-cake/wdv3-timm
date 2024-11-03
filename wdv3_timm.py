@@ -97,7 +97,7 @@ def load_model(repo_id: str) -> nn.Module:
 def main():
     parser = argparse.ArgumentParser(description="Process images with a pretrained model and extract tags.")
     parser.add_argument("image_path", type=Path, help="Path to an image or a directory containing images")
-    parser.add_argument("-m", "--model", choices=MODEL_REPO_MAP.keys(), default="vit", help="Model to use")
+    parser.add_argument("--model", choices=MODEL_REPO_MAP.keys(), default="vit", help="Model to use")
     parser.add_argument("--gen-threshold", type=float, default=0.35, help="General tag threshold")
     parser.add_argument("--char-threshold", type=float, default=0.75, help="Character tag threshold")
 
